@@ -4,12 +4,16 @@ C_SOURCES = $(shell find . -name "*.c")
 S_SOURCES = $(shell find . -name "*.s")
 FILES = floppy.img bochsrc.txt Makefile KERNEL
 
-CC = GCC
+CC = gcc
 LD = ld
 ASM = nasm
 AS = as
 
-all: boot setup floppy
+all: tools boot setup floppy
+
+.PHONY:tools
+tools:
+	$(CC) tools/build.c -o tools/build	
 
 .PHONY:bochs
 bochs:
