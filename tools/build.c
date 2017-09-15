@@ -16,12 +16,20 @@
 void write_boot(char *boot) {
     //write boot
     int fd, len;
+<<<<<<< HEAD
     char buf[BOOT_SIZE];
     assert((fd = open(boot, O_RDONLY)) > 0);
+=======
+    char buf[BUFFER_SIZE];
+    //check
+    assert(argc > 1);
+    assert((fd = open(argv[1], O_RDONLY, 0)) > 0);
+>>>>>>> 4776a2ec70addf5c56724ce89df49ab17e27d63f
     len = read(fd, buf, sizeof(buf));
     //one boot sector must be 512B
     assert(len == BOOT_SIZE);
     //write boot sector to floppy img
+<<<<<<< HEAD
     len = write(STDOUT_FD, buf, BOOT_SIZE);
     assert(len == BOOT_SIZE);
     close(fd);
@@ -47,5 +55,11 @@ int main(int argc, char **argv) {
     write_boot(argc[1]);
     write_setup(argc[2]);
     return 0;
+=======
+    len = write(STDOUT_FD, buf, SECTOR_SIZE);
+    assert(len == SECTOR_SIZE);
+	close(fd);
+	return 0;
+>>>>>>> 4776a2ec70addf5c56724ce89df49ab17e27d63f
 }
 
