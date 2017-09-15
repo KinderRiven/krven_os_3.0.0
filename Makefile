@@ -2,6 +2,7 @@
 
 C_SOURCES = $(shell find . -name "*.c")
 S_SOURCES = $(shell find . -name "*.s")
+FILES = floppy.img bochsrc.txt Makefile KERNEL
 
 CC = GCC
 LD = ld
@@ -34,5 +35,6 @@ floppy:
 git_push:
 	git add $(C_SOURCES)
 	git add $(S_SOURCES)
+	git add $(FILES)
 	git commit -m "update"
 	git push
