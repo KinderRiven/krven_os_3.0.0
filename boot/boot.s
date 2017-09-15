@@ -1,5 +1,6 @@
 boot_addr		equ	07c0h
 init_addr		equ	9000h
+setup_sectors	equ	4
 
 boot_start:
     mov	ax, cs
@@ -35,11 +36,15 @@ load_setup_init:
 
 ;start load
 load_setup:				
-
+	mov	ax,	0x0200 + setup_sectors
+	mov	cx, 0x0002
+	mov	dx,	0
+	mov	bx,	0200h
+	int 0x13
 
 ;jmp to setup
 jmp_setup:
-	jmp	$	
+	jmp	init_addr:0x0200
 	
 
 boot_fill:
