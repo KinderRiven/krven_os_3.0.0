@@ -10,6 +10,9 @@ AS = as
 
 all: boot setup floppy
 
+.PHONY:bochs
+bochs:
+	bochs -f bochsrc.txt
 .PHONY:boot
 boot:
 	$(ASM) boot/boot.s -o boot/boot.o
