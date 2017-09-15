@@ -17,13 +17,14 @@ int main(int argc, char **argv) {
     char buf[BUFFER_SIZE];
     //check
     assert(argc > 1);
-    assert((fd = open(argv[1], O_RDONLY)) > 0);
+    assert((fd = open(argv[1], O_RDONLY, 0)) > 0);
     len = read(fd, buf, sizeof(buf));
     //one boot sector must be 512B
     assert(len == SECTOR_SIZE);
     //write boot sector to floppy img
     len = write(STDOUT_FD, buf, SECTOR_SIZE);
     assert(len == SECTOR_SIZE);
-    return 0;
+	close(fd);
+	return 0;
 }
 
