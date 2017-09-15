@@ -6,7 +6,7 @@ boot_start:
 	mov	ds,	ax
 	mov	es,	ax
 	mov	ss,	ax
-
+	jmp	$
 move_init:
 	xor	bx,	bx
 	mov	ax,	boot_addr
