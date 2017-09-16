@@ -4,27 +4,33 @@ LD = ld
 ASM = nasm
 AS = as
 
-CC_FLAGS = -c -Wall -m32 -nostdinc -Iinclude
+CC_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
 LD_FLAGS = -m elf_i386 -T script/kernel.ld -nostdlib
+ASM_FLAGS = -f elf -g -F stabs
+
 
 all: image
 
 .PHONY: image
-image: tools/build boot/boot boot/setup
-	./tools/build boot/boot boot/setup > FLOPPY
+image: tools/build boot/boot boot/setup kernel
+	./tools/build boot/boot boot/setup KERNEL > FLOPPY
 	dd if=FLOPPY of=floppy.img conv=notrunc
 
+.PHONY: tools/build
 tools/build: tools/build.c
 	$(CC) tools/build.c -o tools/build
 
+.PHONY: boot/boot
 boot/boot: boot/boot.s
 	$(ASM) boot/boot.s -o boot/boot
 
+.PHONY: boot/setup
 boot/setup: boot/setup.s 
 	$(ASM) boot/setup.s -o boot/setup
 
 .PHONY:kernel
-kernel: boot/head.o init/main.o
+kernel: boot/kernel.o init/main.o
+	$(LD) $(LD_FLAGS) boot/kernel.o init/main.o -o KERNEL
 
 #file.c:file.o
 .c.o:
@@ -32,7 +38,7 @@ kernel: boot/head.o init/main.o
 
 #file.s:file.o
 .s.o:
-	$(ASM) $< -o $@
+	$(ASM) $(ASM_FLAGS) $< -o $@
 
 .PHONY:bochs
 bochs: bochsrc.txt

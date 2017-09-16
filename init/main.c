@@ -1,5 +1,5 @@
 #include <types.h>
-void kernel_entry() {
+void kernel_init() {
 	
 	
 }
