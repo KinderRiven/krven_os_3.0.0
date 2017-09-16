@@ -1,44 +1,56 @@
 #Makefile
-
-C_SOURCES = $(shell find . -name "*.c")
-S_SOURCES = $(shell find . -name "*.s")
-FILES = floppy.img bochsrc.txt Makefile KERNEL
-
 CC = gcc
 LD = ld
 ASM = nasm
 AS = as
 
-all: tools boot setup floppy
+CC_FLAGS = -c -Wall -m32 -nostdinc -Iinclude
+LD_FLAGS = -m elf_i386 -T script/kernel.ld -nostdlib
 
-.PHONY:tools
-tools:
-	$(CC) tools/build.c -o tools/build	
+all: image
+
+.PHONY: image
+image: tools/build boot/boot boot/setup
+	./tools/build boot/boot boot/setup > FLOPPY
+	dd if=FLOPPY of=floppy.img conv=notrunc
+
+tools/build: tools/build.c
+	$(CC) tools/build.c -o tools/build
+
+boot/boot: boot/boot.s
+	$(ASM) boot/boot.s -o boot/boot
+
+boot/setup: boot/setup.s 
+	$(ASM) boot/setup.s -o boot/setup
+
+.PHONY:kernel
+kernel: boot/head.o init/main.o
+
+#file.c:file.o
+.c.o:
+	$(CC) $(CC_FLAGS) $< -o $@
+
+#file.s:file.o
+.s.o:
+	$(ASM) $< -o $@
 
 .PHONY:bochs
-bochs:
+bochs: bochsrc.txt
 	bochs -f bochsrc.txt
-.PHONY:boot
-boot:
-	$(ASM) boot/boot.s -o boot/boot.o
 
-.PHONY:setup
-setup:
-	$(ASM) boot/setup.s -o boot/setup.o
+.PHONY:clean
+clean:
+	rm -f $(shell find . -name "*.o") tools/build boot/boot boot/setup
 
+#github
 .PHONY:git_pull
 git_pull:
 	git pull
 
-.PHONY:floppy
-floppy:
-	./tools/build boot/boot.o boot/setup.o > KERNEL
-	dd if=KERNEL of=floppy.img conv=notrunc
-
 .PHONY:git_push
 git_push:
-	git add $(C_SOURCES)
-	git add $(S_SOURCES)
-	git add $(FILES)
-	git commit -m "update"
+	git add $(shell find . -name "*.s")
+	git add $(shell find . -name "*.c")
+	git add floppy.img bochsrc.txt Makefile
+	git commit -m "$(shell date)"
 	git push

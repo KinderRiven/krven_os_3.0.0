@@ -6,6 +6,12 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #define STDIN_FD        0
 #define STDOUT_FD       1
