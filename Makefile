@@ -4,7 +4,8 @@ LD = ld
 ASM = nasm
 AS = as
 
-CC_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
+#CC_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
+CC_FLAGS = -c -Wall -m32 -nostdinc -Iinclude
 LD_FLAGS = -m elf_i386 -T script/kernel.ld -nostdlib
 ASM_FLAGS = -f elf -g -F stabs
 
@@ -13,7 +14,7 @@ all: image
 
 .PHONY: image
 image: tools/build boot/boot boot/setup kernel
-	./tools/build boot/boot boot/setup KERNEL > FLOPPY
+	./tools/build boot/boot boot/setup KERNEL.bin > FLOPPY
 	dd if=FLOPPY of=floppy.img conv=notrunc
 
 .PHONY: tools/build
@@ -31,6 +32,7 @@ boot/setup: boot/setup.s
 .PHONY:kernel
 kernel: boot/kernel.o init/main.o
 	$(LD) $(LD_FLAGS) boot/kernel.o init/main.o -o KERNEL
+	objcopy -O binary KERNEL KERNEL.bin
 
 #file.c:file.o
 .c.o:

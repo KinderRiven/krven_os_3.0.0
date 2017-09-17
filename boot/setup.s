@@ -1,3 +1,4 @@
+
 setup_start:
 	mov	ax,	0xffff
 	mov	bx,	0xffff
