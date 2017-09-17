@@ -56,9 +56,8 @@ git_pull:
 	git pull
 
 .PHONY:git_push
-git_push:
+git_add:
 	git add $(shell find . -name "*.s")
 	git add $(shell find . -name "*.c")
 	git add floppy.img bochsrc.txt Makefile
 	git commit -m "$(shell date)"
-	git push
