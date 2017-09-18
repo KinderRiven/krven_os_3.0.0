@@ -4,7 +4,6 @@ LD = ld
 ASM = nasm
 AS = as
 
-#CC_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
 CC_FLAGS = -c -Wall -m32 -nostdinc -Iinclude
 LD_FLAGS = -m elf_i386 -T script/kernel.ld -nostdlib
 ASM_FLAGS = -f elf -g -F stabs

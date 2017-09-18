@@ -8,7 +8,7 @@ kernel_entry:
 	jmp	$
 	xor	si, si
 	xor di, di
-
+	times 0x1000 - ($ - $$) db 0x12
 section .data
-	times 1024 db 0x11
+	times 0x1000 - ($ - $$) db 0x34
 
