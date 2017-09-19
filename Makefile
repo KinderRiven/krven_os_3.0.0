@@ -26,7 +26,7 @@ boot/boot: boot/boot.s
 
 .PHONY: boot/setup
 boot/setup: boot/setup.s 
-	$(ASM) boot/setup.s -o boot/setup
+	$(ASM) boot/setup.s -o boot/setup -I boot/
 
 .PHONY:kernel
 kernel: boot/kernel.o init/main.o
