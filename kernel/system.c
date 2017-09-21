@@ -12,7 +12,6 @@
 //|1| 2 |1| 4  |1|1|1|  5  |
 //--------------------------
 
-
 static void set_gate(descriptor_t *gate_addr, uint8_t type, uint8_t dpl, uint32_t addr) {
 	uint16_t *ptr = (uint16_t *) gate_addr;
 	*ptr++ = (addr & 0xFFFF);
@@ -28,9 +27,3 @@ void set_intr_gate(uint8_t n, uint32_t addr) {
 void set_trap_gate(uint8_t n, uint32_t addr) {
 	set_gate(&idt[n], 15, 0, addr);
 }
-
-
-
-//type C 
-
-

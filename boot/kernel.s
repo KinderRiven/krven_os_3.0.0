@@ -22,9 +22,7 @@ kernel_entry:
 	mov		esp,kernel_stack
 	lgdt	[gdt_48]
 	lidt	[idt_48]
-	sti
 	call	kernel_main
-	int		0x80
 	jmp		$		
 
 times	(4096 * 5)	db	0
