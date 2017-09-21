@@ -7,7 +7,7 @@ SETUP_NUM		equ	4
 SETUP_START		equ	2
 KERNEL_SEG		equ	1000h
 KERNEL_ADDR		equ	0
-KERNEL_SIZE		equ	3000h
+KERNEL_SIZE		equ	8000h
 KERNEL_START	equ	6
 
 boot_start:

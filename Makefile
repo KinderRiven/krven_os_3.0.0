@@ -29,8 +29,8 @@ boot/setup: boot/setup.s
 	$(ASM) boot/setup.s -o boot/setup -I boot/
 
 .PHONY:kernel
-kernel: boot/kernel.o init/main.o
-	$(LD) $(LD_FLAGS) boot/kernel.o init/main.o -o KERNEL
+kernel: boot/kernel.o init/main.o kernel/system.o
+	$(LD) $(LD_FLAGS) boot/kernel.o init/main.o kernel/system.o -o KERNEL
 	objcopy -O binary KERNEL KERNEL.bin
 
 #file.c:file.o
