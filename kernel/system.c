@@ -27,3 +27,11 @@ void set_intr_gate(uint8_t n, uint32_t addr) {
 void set_trap_gate(uint8_t n, uint32_t addr) {
 	set_gate(&idt[n], 15, 0, addr);
 }
+
+void set_tss_desc(uint8_t n, uint32_t addr) {
+
+}
+
+void set_ldt_desc(uint8_t n, uint32_t addr) {
+
+}
