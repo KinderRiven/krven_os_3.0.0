@@ -1,7 +1,7 @@
 #include <string.h>
 
 inline int strlen(char *buf) {
-	int i;
-	for(i = 0; buf[i]; i++);
+	int i = 0;
+	while(buf[i]++);
 	return i;
 }

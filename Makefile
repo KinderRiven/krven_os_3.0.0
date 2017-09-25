@@ -31,12 +31,14 @@ boot/setup: boot/setup.s
 .PHONY:kernel
 kernel: boot/kernel.o init/main.o kernel/system.o\
 	kernel/traps.o kernel/traps_s.o kernel/sched.o kernel/interrupt.o \
-	lib/string.o kernel/console.o 
+	kernel/io.o lib/string.o kernel/console.o  kernel/asm.o \
+	mm/memory.o
 	$(LD) $(LD_FLAGS) \
 	boot/kernel.o init/main.o kernel/system.o \
 	kernel/traps.o kernel/traps_s.o \
 	kernel/sched.o kernel/interrupt.o \
-	lib/string.o kernel/console.o \
+	kernel/io.o lib/string.o kernel/console.o kernel/asm.o \
+	mm/memory.o \
 	-o KERNEL
 	objcopy -O binary KERNEL KERNEL.bin
 

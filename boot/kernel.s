@@ -22,10 +22,22 @@ kernel_entry:
 	mov		esp,kernel_stack
 	lgdt	[gdt_48]
 	lidt	[idt_48]
-	call	kernel_main
-	jmp		$		
+	jmp		kernel_jmp
+		
+fill:
+	times	PAGE_SIZE - ($ - $$)	db	0
+page_0:
+	times	PAGE_SIZE	db	0x11
+page_1:
+	times	PAGE_SIZE	db	0x22
+page_3:
+	times	PAGE_SIZE	db	0x33
+page_4:
+	times	PAGE_SIZE	db	0x44
 
-times	(4096 * 5)	db	0
+kernel_jmp:
+	call	kernel_main
+	jmp		$
 
 section .data
 ALIGN	8
@@ -46,7 +58,7 @@ gdt:
 	dw	0x9200
 	dw	0x00CF
 	;other
-	times	(253 * 8)	db	0
+	times	((256 - 3) * 8)	db	0
 gdt_length	equ		($ - gdt - 1)
 
 idt_48:
@@ -55,5 +67,6 @@ idt_48:
 idt:
 	times	(8 * 256)	db	0
 idt_length	equ		($ - idt - 1)
+kernel_stack_bottom:
 	times	2048	db	0	
 kernel_stack:
