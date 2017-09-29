@@ -103,7 +103,7 @@ load_kernel_ok0:
 	mov		ax, [current_addr]
 	add		ax, 512
 	mov		[current_addr], ax
-	;if not > 0x1000 (64K)
+	;if not >= 0x10000 (64K)
 	jnc		load_kernel_ok1
 	jmp		$
 

@@ -4,10 +4,9 @@ LD = ld
 ASM = nasm
 AS = as
 
-CC_FLAGS = -c -Wall -m32 -nostdinc -Iinclude
+CC_FLAGS = -c -Wall -m32 -nostdinc -fno-stack-protector -Iinclude
 LD_FLAGS = -m elf_i386 -T script/kernel.ld -nostdlib
 ASM_FLAGS = -f elf -g -F stabs
-
 
 all: image
 
@@ -30,15 +29,15 @@ boot/setup: boot/setup.s
 
 .PHONY:kernel
 kernel: boot/kernel.o init/main.o kernel/system.o\
-	kernel/traps.o kernel/traps_s.o kernel/sched.o kernel/interrupt.o \
+	kernel/traps.o kernel/traps_s.o kernel/sched.o kernel/int.o \
 	kernel/io.o lib/string.o kernel/console.o  kernel/asm.o \
-	mm/memory.o
+	mm/memory.o kernel/vsprintf.o kernel/printk.o
 	$(LD) $(LD_FLAGS) \
 	boot/kernel.o init/main.o kernel/system.o \
 	kernel/traps.o kernel/traps_s.o \
-	kernel/sched.o kernel/interrupt.o \
+	kernel/sched.o kernel/int.o \
 	kernel/io.o lib/string.o kernel/console.o kernel/asm.o \
-	mm/memory.o \
+	mm/memory.o kernel/vsprintf.o kernel/printk.o \
 	-o KERNEL
 	objcopy -O binary KERNEL KERNEL.bin
 
