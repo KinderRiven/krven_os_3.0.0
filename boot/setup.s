@@ -1,6 +1,6 @@
 [BITS 16]
 %include	"global.inc"
-KERNEL_SIZE			equ	3000h
+KERNEL_SIZE			equ	8000h
 SETUP_SEG			equ	9020h
 INFO_SEG			equ	9000h
 KERNEL_TEXT_SELECT	equ	0008h
@@ -15,7 +15,7 @@ setup_start:
 get_info_init:
 	mov		ax, INFO_SEG
 	mov		ds,	ax	
-
+	
 ;get memory info
 get_mem_info:
 	mov		ah, 0x88
@@ -25,6 +25,16 @@ get_mem_info:
 
 ;get info ok
 get_info_ok:
+	mov		ax, SETUP_SEG
+	mov		es, ax
+	push	info_message
+	push	es
+	push	info_message_length
+	push	0x02
+	push	0x0200
+	mov		bp, sp
+	call	print_message
+	add 	sp, 10
 
 ;move kernel
 do_move_init:
@@ -44,6 +54,69 @@ do_move:
 	add		bx, 2
 	jc		update_seg
 	loop	do_move	
+
+;init 8259A
+init_8259A:
+	;ICW1	master	
+	;--------------------------
+	;|0|0|0|1|LTIM|0|SNGL|ICW4|
+	;--------------------------
+	;|0|0|0|1|   0|0|   0|   1|
+	;--------------------------
+	;|SNGL = 0 is levels
+	;--------------------------
+	mov		al, 011h
+	out		020h, al
+	call	io_delay
+	;ICW1	
+	out		0A0h, al
+	call	io_delay
+
+	;ICW2	master
+	;----------------------
+	;|T7|T6|T5|T4|T3|0|0|0|
+	;----------------------
+	;| 0| 0| 1| 0| 0|0|0|0|
+	;----------------------
+	;|modify int vector
+	;----------------------
+	mov		al, 020h
+	out		021h, al
+	call	io_delay
+	;ICW2
+	mov		al, 028h
+	out		0A1h, al
+	call	io_delay
+	
+	;ICW3	master
+	mov		al, 004h
+	out		021h, al
+	call	io_delay	
+	;ICW3	stave
+	mov		al, 002h
+	out		0A1h, al
+	call	io_delay
+	
+	;ICW4	master
+	;----------------------
+	;|0|0|0|0|0|0|0|AEOI|1|
+	;----------------------
+	;|0|0|0|0|0|0|0|   1|1|
+	;----------------------
+	;|AEOI = 0 no
+	;----------------------
+	mov		al, 001h
+	out		021h, al
+	call	io_delay
+	;ICW4	stave
+	out		0A1h, al
+	call	io_delay
+	;mask off all interrupts
+	mov		al, 0xFF
+	out		0x21, al
+	call	io_delay
+	out		0xA1, al	
+	call	io_delay
 
 load_gdt_idt:
 	mov		ax, SETUP_SEG
@@ -88,10 +161,21 @@ print_message:
 get_info_error:
 	jmp		$
 
+io_delay:
+	nop
+	nop
+	nop
+	nop
+	nop
+	ret
+
 error_message:
 	dw		"GET INFO ERROE"
 error_message_length	equ	($ - error_message)
 
+info_message:
+	dw		"GET INFO OK"
+info_message_length	equ	($ - info_message)
 ;--------------------------------------------;
 gdt:
 	;null segment
@@ -116,4 +200,4 @@ idt_48:
 	dw	0, 0, 0
 ;--------------------------------------------;
 setup_fill:
-	times 2048 - ($ - $$) db 0x11
+	times 2048 - ($ - $$) db 0

@@ -7,7 +7,7 @@ SETUP_NUM		equ	4
 SETUP_START		equ	2
 KERNEL_SEG		equ	1000h
 KERNEL_ADDR		equ	0
-KERNEL_SIZE		equ	3000h
+KERNEL_SIZE		equ	8000h
 KERNEL_START	equ	6
 
 boot_start:
@@ -103,7 +103,7 @@ load_kernel_ok0:
 	mov		ax, [current_addr]
 	add		ax, 512
 	mov		[current_addr], ax
-	;if not > 0x1000 (64K)
+	;if not >= 0x10000 (64K)
 	jnc		load_kernel_ok1
 	jmp		$
 
