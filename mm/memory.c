@@ -1,10 +1,13 @@
 #include <types.h>
 #include <memory.h>
 
-uint32_t *mem_dir;
-uint32_t *mem_page[NR_PAGES];
+static uint32_t *mem_dir;
+static uint32_t *mem_page[NR_PAGES];
+static uint32_t  mem_stack[NR_MM_PAGES];
+static int mem_stack_top;
 
-void vmm_init() {
+static void page_init()
+{
 	int i, j;
 	//link memory page ptr
 	mem_dir = (uint32_t *) 0x0000;
@@ -36,12 +39,21 @@ void vmm_init() {
 	asm volatile("mov %0, %%cr0"::"r"(cr0));
 }
 
-void pmm_init() {
-
+static void stack_init(uint32_t memory_start, uint32_t memory_end) 
+{
+	uint32_t addr;
+	memory_start &= PAGE_MASK;
+	memory_end &= PAGE_MASK;
+	mem_stack_top = 0;
+	for(addr = memory_start; addr < memory_end; addr += PAGE_SIZE) {
+		mem_stack[mem_stack_top++] = addr;
+	}
+	printk("[OK] mem_stack_top:%d/%d\n",mem_stack_top, NR_MM_PAGES);
 }
 
-int mem_init(uint32_t memory_start, uint32_t memory_end) {
-	vmm_init();
-	pmm_init();
+int mem_init(uint32_t memory_start, uint32_t memory_end)
+{
+	page_init();
+	stack_init(memory_start, memory_end);
 	return 1;
 }

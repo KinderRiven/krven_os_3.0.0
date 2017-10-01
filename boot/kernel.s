@@ -68,5 +68,5 @@ idt:
 	times	(8 * 256)	db	0
 idt_length	equ		($ - idt - 1)
 kernel_stack_bottom:
-	times	2048	db	0	
+	times	4096	db	0	
 kernel_stack:

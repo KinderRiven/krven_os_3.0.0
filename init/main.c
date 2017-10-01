@@ -21,7 +21,7 @@ void kernel_main() {
 
 	//init console
 	if(con_init()) {
-		printc(c_black, c_green, "[success] init console!\n");
+		//printc(c_black, c_green, "[OK] init console!\n");
 	}
 	
 	//memory init
@@ -29,21 +29,24 @@ void kernel_main() {
 	memory_start &= 0xfffff000;
 	memory_end = (1<<20) + (EXT_MEM_K<<10);
 	memory_end &= 0xfffff000;
+	printc(c_black, c_light_red, "[OK] mem_start:%dMB,mem_end:%dMB\n", 
+		memory_start/(1024*1024), memory_end/(1024*1024));
 	if(mem_init(memory_start, memory_end)) {
-		printc(c_black, c_green, "[success] init memory!\n");
+		//printc(c_black, c_green, "[OK] init memory!\n");
 	}
 	
 	//set trap gate
 	if(trap_init()) {
-		printc(c_black, c_green, "[success] init trap!\n");
+		//printc(c_black, c_green, "[OK] init trap!\n");
 	}
 
 	//init sched [set timer, task0]
 	if(sched_init()) {
-		printc(c_black, c_green, "[success] init sched!\n");
+		//printc(c_black, c_green, "[OK] init sched!\n");
 	}
 
 	//sti
 	sti();
 	move_to_user_mode();
+	for(;;);
 }
