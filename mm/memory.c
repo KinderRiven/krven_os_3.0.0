@@ -48,7 +48,6 @@ static void stack_init(uint32_t memory_start, uint32_t memory_end)
 	for(addr = memory_start; addr < memory_end; addr += PAGE_SIZE) {
 		mem_stack[mem_stack_top++] = addr;
 	}
-	printk("[OK] mem_stack_top:%d/%d\n",mem_stack_top, NR_MM_PAGES);
 }
 
 int mem_init(uint32_t memory_start, uint32_t memory_end)

@@ -41,6 +41,7 @@ kernel_jmp:
 
 section .data
 ALIGN	8
+
 gdt_48:
 	dw	gdt_length
 	dd	gdt
@@ -67,6 +68,7 @@ idt_48:
 idt:
 	times	(8 * 256)	db	0
 idt_length	equ		($ - idt - 1)
+
 kernel_stack_bottom:
 	times	4096	db	0	
 kernel_stack:

@@ -77,7 +77,7 @@ void set_tss_descriptor(uint8_t n, uint32_t addr)
 {
 	uint32_t limit = 103;
 	uint32_t nature = (uint32_t)D_TSS | (((limit >> 16) & 0x0F) << 8) | 0x8000;
-	set_descriptor(&gdt[n+FIRST_TSS_ENTRY], addr, limit, nature);
+	set_descriptor(&gdt[2*n+FIRST_TSS_ENTRY], addr, limit, nature);
 }
 
 //ldt
@@ -85,5 +85,5 @@ void set_ldt_descriptor(uint8_t n, uint32_t addr, uint8_t num)
 {
 	uint32_t limit = 8 * num - 1;
 	uint32_t nature = (uint32_t)D_LDT | (((limit >> 16) & 0x0F) << 8) | 0x8000;
-	set_descriptor(&gdt[n+FIRST_LDT_ENTRY], addr, limit, nature);
+	set_descriptor(&gdt[2*n+FIRST_LDT_ENTRY], addr, limit, nature);
 }
