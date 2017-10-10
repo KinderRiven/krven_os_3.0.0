@@ -16,6 +16,8 @@ char user_stack[NR_TASKS][PAGE_SIZE];
 static union task_union init_task;
 static union task_union user_task;
 struct task_struct *task[NR_TASKS];
+struct task_struct *current;
+static int current_index = 0;
 
 static void set_timer(int frequency) 
 {
@@ -26,6 +28,40 @@ static void set_timer(int frequency)
 	outb(0x40, low);
 	outb(0x40, high);
 	outb(0x21, inb(0x21)&~0x01);
+}
+
+#ifndef _SWITCH_TO
+#define switch_to(n) {\
+struct {long a,b;} __tmp; \
+__asm__("cmpl %%ecx,current\n\t" \
+	"je 1f\n\t" \
+	"movw %%dx,%1\n\t" \
+	"xchgl %%ecx,current\n\t" \
+	"ljmp *%0\n\t" \
+	"jne 1f\n\t" \
+	"clts\n" \
+	"1:" \
+	::"m" (*&__tmp.a),"m" (*&__tmp.b), \
+	"d" (_TSS(n)),"c" ((long) task[n])); \
+}	
+#endif
+
+void schedule()
+{
+	while(1) {
+		current_index = ((current_index + 1) % NR_TASKS);
+		if(task[current_index] != NULL) {
+			break;
+		}
+	}
+	printk("[%d]\n", _TSS(current_index));
+	switch_to(current_index);
+	//while(1);
+}
+
+void do_timer(uint16_t dpl)
+{
+	schedule();	
 }
 
 static void set_new_task(int num, union task_union *new_task) 
