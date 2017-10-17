@@ -38,6 +38,9 @@ page_4:
 kernel_jmp:
 	call	kernel_main
 	jmp		$
+	jmp		$
+	jmp		$
+	jmp		$
 
 section .data
 ALIGN	8

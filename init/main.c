@@ -8,11 +8,27 @@
 
 extern void move_to_user_mode();
 extern int trap_init();
-
 static uint32_t memory_start;
 static uint32_t memory_end;
 
 #define EXT_MEM_K (*((uint16_t*)0x90002))
+
+#ifndef _move_to_user_mode()
+#define _move_to_user_mode() \
+__asm__ ("movl %%esp,%%eax\n\t" \
+	"pushl $0x17\n\t" \
+	"pushl %%eax\n\t" \
+	"pushfl\n\t" \
+	"pushl $0x0f\n\t" \
+	"pushl $1f\n\t" \
+	"iret\n" \
+	"1:\tmovl $0x17,%%eax\n\t" \
+	"movw %%ax,%%ds\n\t" \
+	"movw %%ax,%%es\n\t" \
+	"movw %%ax,%%fs\n\t" \
+	"movw %%ax,%%gs" \
+	:::"ax")
+#endif
 
 void kernel_main() {
 	int i, flags = 0;
@@ -21,9 +37,7 @@ void kernel_main() {
 
 	//init console
 	flags = con_init();
-	if(flags) {
-
-	}
+	if(flags) {}
 	
 	//memory init
 	memory_start = (1<<20);
@@ -31,23 +45,18 @@ void kernel_main() {
 	memory_end = (1<<20) + (EXT_MEM_K<<10);
 	memory_end &= 0xfffff000;
 	flags = mem_init(memory_start, memory_end); 
-	if(flags) {
-	
-	}
+	if(flags) {}
 	
 	//set trap gate
 	flags = trap_init();
-	if(flags) {
-	
-	}
+	if(flags) {}
 
 	//init sched [set timer, task0]
 	flags = sched_init();
-	if(flags) {
+	if(flags) {}
 	
-	}
 	//sti
 	sti();
 	move_to_user_mode();
-	for(;;);
+	for(;;) {}
 }

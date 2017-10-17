@@ -13,18 +13,20 @@ union task_union {
 };
 
 char user_stack[NR_TASKS][PAGE_SIZE];
+
 static union task_union init_task;
 static union task_union user_task;
 struct task_struct *task[NR_TASKS];
 struct task_struct *current;
 static int current_index = 0;
 
-static void set_timer(int frequency) 
+static void init_timer(uint32_t frequency) 
 {
+	set_intr_gate(0x20, (uint32_t)timer_interrupt);
 	uint32_t divisor = 1193180 / frequency;
 	outb(0x43, 0x36);
-	uint8_t low = (uint8_t) (divisor & 0xFF);
-	uint8_t high = ((uint8_t)divisor >> 8) & 0xFF;
+	uint8_t low = (uint8_t)(divisor & 0xFF);
+	uint8_t high = (uint8_t)((divisor >> 8) & 0xFF);
 	outb(0x40, low);
 	outb(0x40, high);
 	outb(0x21, inb(0x21)&~0x01);
@@ -54,34 +56,30 @@ void schedule()
 			break;
 		}
 	}
-	printk("[%d]\n", _TSS(current_index));
-	switch_to(current_index);
-	//while(1);
 }
 
 void do_timer(uint16_t dpl)
 {
-	schedule();	
+	if(!dpl) {
+		return;
+	}
+	schedule();
 }
 
-static void set_new_task(int num, union task_union *new_task) 
+static void set_new_task(int num, union task_union *new_task, uint32_t enter_addr) 
 {
 	//add to point array
 	task[num] = &(new_task->task);
-
 	//set ldt segment [base limit dpl type]
 	set_seg_descriptor(&(new_task->task.ldt[1]), 0, 0xFFFFFFFF, 3, D_RE);
 	set_seg_descriptor(&(new_task->task.ldt[2]), 0, 0xFFFFFFFF, 3, D_RW);
-	
 	//set ldt date	
 	set_ldt_descriptor(num, (uint32_t)new_task->task.ldt, 3);	
 	//set tss gate
 	set_tss_descriptor(num, (uint32_t)&(new_task->task.tss));
 	//ss esp
-	new_task->task.tss.esp0 = (uint32_t)&(new_task->task) + PAGE_SIZE;
+	new_task->task.tss.esp0 = (uint32_t)&(new_task->task) + PAGE_SIZE - 1;
 	new_task->task.tss.ss0 = 0x10;	
-	new_task->task.tss.esp2 = (uint32_t)user_stack[num] + PAGE_SIZE;
-	new_task->task.tss.ss2 = 0x17;
 	//cr3
 	new_task->task.tss.cr3 = (uint32_t)&page_dir;
 	//io
@@ -91,17 +89,24 @@ static void set_new_task(int num, union task_union *new_task)
 	//cs es fs ds ss gs
 	new_task->task.tss.cs = new_task->task.tss.es = new_task->task.tss.fs = 0x17;
 	new_task->task.tss.ds = new_task->task.tss.ss = new_task->task.tss.gs = 0x17;
-	
+	//eip
+	new_task->task.tss.eip = enter_addr;
 }
 
 static void set_init_task() 
 {	
-	set_new_task(0, &init_task);
+	set_new_task(0, &init_task, 0);
 	__asm__("pushfl ; andl $0xffffbfff,(%esp) ; popfl");
 	//set ldt register
 	lldt(0);
 	//set tss register
 	ltr(0);
+	current = &init_task.task; 
+}
+
+static void user_task_enter() 
+{
+	while(1);
 }
 
 static void set_user_task(union task_union *user_task)
@@ -109,7 +114,7 @@ static void set_user_task(union task_union *user_task)
 	int i;
 	for(i = 0; i < NR_TASKS; i++) {
 		if(task[i] == NULL) {
-			set_new_task(i, user_task);
+			set_new_task(i, user_task, (uint32_t)user_task_enter);
 			break;
 		}
 	}	
@@ -117,9 +122,7 @@ static void set_user_task(union task_union *user_task)
 
 int sched_init() 
 {
-	set_intr_gate(0x20, (uint32_t)timer_interrupt);
 	set_init_task();
-	set_user_task(&user_task);
-	set_timer(100);
+	init_timer(100);
 	return 1;
 }
