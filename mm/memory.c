@@ -1,5 +1,6 @@
 #include <types.h>
 #include <memory.h>
+#include <kernel.h>
 
 static uint32_t *mem_dir;
 static uint32_t *mem_page[NR_PAGES];
@@ -39,7 +40,7 @@ static void page_init()
 	asm volatile("mov %0, %%cr0"::"r"(cr0));
 }
 
-static void stack_init(uint32_t memory_start, uint32_t memory_end) 
+static void mem_stack_init(uint32_t memory_start, uint32_t memory_end) 
 {
 	uint32_t addr;
 	memory_start &= PAGE_MASK;
@@ -48,11 +49,12 @@ static void stack_init(uint32_t memory_start, uint32_t memory_end)
 	for(addr = memory_start; addr < memory_end; addr += PAGE_SIZE) {
 		mem_stack[mem_stack_top++] = addr;
 	}
+	printc(c_black, c_light_red, "[MEMORY] MEM_STACK:%d(0x%x-0x%x)\n", mem_stack_top, memory_start, memory_end);
 }
 
 int mem_init(uint32_t memory_start, uint32_t memory_end)
 {
 	page_init();
-	stack_init(memory_start, memory_end);
+	mem_stack_init(memory_start, memory_end);
 	return 1;
 }

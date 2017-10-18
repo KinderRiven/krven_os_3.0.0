@@ -29,13 +29,13 @@ boot/setup: boot/setup.s
 
 .PHONY:kernel
 kernel: boot/kernel.o init/main.o kernel/system.o\
-	kernel/traps.o kernel/traps_s.o kernel/sched.o kernel/int.o \
+	kernel/traps.o kernel/traps_s.o kernel/sched.o kernel/system_call_s.o \
 	kernel/io.o lib/string.o kernel/console.o  kernel/asm.o \
 	mm/memory.o kernel/vsprintf.o kernel/printk.o
 	$(LD) $(LD_FLAGS) \
 	boot/kernel.o init/main.o kernel/system.o \
 	kernel/traps.o kernel/traps_s.o \
-	kernel/sched.o kernel/int.o \
+	kernel/sched.o kernel/system_call_s.o \
 	kernel/io.o lib/string.o kernel/console.o kernel/asm.o \
 	mm/memory.o kernel/vsprintf.o kernel/printk.o \
 	-o KERNEL

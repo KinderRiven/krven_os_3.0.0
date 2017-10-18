@@ -15,7 +15,6 @@ union task_union {
 char user_stack[NR_TASKS][PAGE_SIZE];
 
 static union task_union init_task;
-static union task_union user_task;
 struct task_struct *task[NR_TASKS];
 struct task_struct *current;
 static int current_index = 0;
@@ -56,6 +55,7 @@ void schedule()
 			break;
 		}
 	}
+	switch_to(current_index);
 }
 
 void do_timer(uint16_t dpl)
@@ -78,19 +78,21 @@ static void set_new_task(int num, union task_union *new_task, uint32_t enter_add
 	//set tss gate
 	set_tss_descriptor(num, (uint32_t)&(new_task->task.tss));
 	//ss esp
-	new_task->task.tss.esp0 = (uint32_t)&(new_task->task) + PAGE_SIZE - 1;
+	new_task->task.tss.esp0 = (uint32_t)&(new_task->task) + PAGE_SIZE;
 	new_task->task.tss.ss0 = 0x10;	
 	//cr3
 	new_task->task.tss.cr3 = (uint32_t)&page_dir;
 	//io
 	new_task->task.tss.trace_bitmap = 0x80000000;
 	//eflags
-	new_task->task.tss.eflags = 0;
+	new_task->task.tss.eflags = 0x202;
 	//cs es fs ds ss gs
-	new_task->task.tss.cs = new_task->task.tss.es = new_task->task.tss.fs = 0x17;
-	new_task->task.tss.ds = new_task->task.tss.ss = new_task->task.tss.gs = 0x17;
+	new_task->task.tss.cs = 0x0f;
+	new_task->task.tss.ss = new_task->task.tss.fs = new_task->task.tss.ds =  \
+	new_task->task.tss.es = new_task->task.tss.gs = 0x17;
 	//eip
 	new_task->task.tss.eip = enter_addr;
+	new_task->task.tss.esp = (uint32_t)user_stack[num] + PAGE_SIZE;
 }
 
 static void set_init_task() 
@@ -102,22 +104,6 @@ static void set_init_task()
 	//set tss register
 	ltr(0);
 	current = &init_task.task; 
-}
-
-static void user_task_enter() 
-{
-	while(1);
-}
-
-static void set_user_task(union task_union *user_task)
-{
-	int i;
-	for(i = 0; i < NR_TASKS; i++) {
-		if(task[i] == NULL) {
-			set_new_task(i, user_task, (uint32_t)user_task_enter);
-			break;
-		}
-	}	
 }
 
 int sched_init() 
