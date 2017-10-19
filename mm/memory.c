@@ -49,7 +49,7 @@ static void mem_stack_init(uint32_t memory_start, uint32_t memory_end)
 	for(addr = memory_start; addr < memory_end; addr += PAGE_SIZE) {
 		mem_stack[mem_stack_top++] = addr;
 	}
-	printc(c_black, c_light_red, "[MEMORY] MEM_STACK:%d(0x%x-0x%x)\n", mem_stack_top, memory_start, memory_end);
+	printc(c_black, c_light_green, "[MEMORY] MEM_STACK:%d(0x%x-0x%x)\n", mem_stack_top, memory_start, memory_end);
 }
 
 int mem_init(uint32_t memory_start, uint32_t memory_end)

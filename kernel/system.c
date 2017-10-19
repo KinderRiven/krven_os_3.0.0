@@ -67,9 +67,16 @@ void set_intr_gate(uint8_t n, uint32_t addr)
 }
 
 //trap F
+//dpl = 0
 void set_trap_gate(uint8_t n, uint32_t addr) 
 {
 	set_gate(&idt[n], addr, 0x0008, (uint32_t)G_TRAP << 8);	
+}
+
+//dpl = 3
+void set_system_gate(uint8_t n, uint32_t addr)
+{
+	set_gate(&idt[n], addr, 0x0008, (uint32_t)(G_TRAP|(3<<5)) << 8);			
 }
 
 //tss

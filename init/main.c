@@ -57,8 +57,17 @@ void kernel_main() {
 		printc(c_black, c_red, "[ERROR] SCHEDULE INIT\n");
 	}
 	
+	//init system call
+	flags = system_call_init();
+	if(flags) {
+		printc(c_black, c_green, "[SUCCESS] SYSTEM CALL INIT\n");
+	}
+	else {
+		printc(c_black, c_red, "[ERROR] SYSTEM CALL INIT\n");
+	}	
 	//sti
 	sti();
 	move_to_user_mode();
+	__asm__ volatile("int $0x80");
 	for(;;) {}
 }

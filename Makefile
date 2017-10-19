@@ -28,16 +28,21 @@ boot/setup: boot/setup.s
 	$(ASM) boot/setup.s -o boot/setup -I boot/
 
 .PHONY:kernel
-kernel: boot/kernel.o init/main.o kernel/system.o\
-	kernel/traps.o kernel/traps_s.o kernel/sched.o kernel/system_call_s.o \
-	kernel/io.o lib/string.o kernel/console.o  kernel/asm.o \
-	mm/memory.o kernel/vsprintf.o kernel/printk.o
-	$(LD) $(LD_FLAGS) \
-	boot/kernel.o init/main.o kernel/system.o \
+kernel: boot/kernel.o init/main.o \
+	kernel/system.o kernel/sched.o \
 	kernel/traps.o kernel/traps_s.o \
-	kernel/sched.o kernel/system_call_s.o \
+	kernel/system_call.o kernel/system_call_s.o \
+	kernel/io.o lib/string.o kernel/console.o  kernel/asm.o \
+	mm/memory.o \
+	kernel/vsprintf.o kernel/printk.o
+	$(LD) $(LD_FLAGS) \
+	boot/kernel.o init/main.o \
+	kernel/system.o  kernel/sched.o \
+	kernel/traps.o kernel/traps_s.o \
+	kernel/system_call.o kernel/system_call_s.o \
 	kernel/io.o lib/string.o kernel/console.o kernel/asm.o \
-	mm/memory.o kernel/vsprintf.o kernel/printk.o \
+	mm/memory.o \
+	kernel/vsprintf.o kernel/printk.o \
 	-o KERNEL
 	objcopy -O binary KERNEL KERNEL.bin
 

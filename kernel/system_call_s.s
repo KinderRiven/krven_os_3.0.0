@@ -1,5 +1,6 @@
 [BITS 32]
 [global timer_interrupt]
+[global system_call]
 [global move_to_user_mode]
 [extern do_timer]
 
@@ -14,9 +15,19 @@ ret_from_sys_call:
 	pop		ds
 	iret
 
-;system_call_0 test
-sys_test:
-	jmp		$
+system_call:
+	push	ds
+	push	es
+	push	fs
+	push	edx
+	push	ecx
+	push	ebx
+	push	eax
+	mov		eax, 0x10
+	mov		ds,	ax
+	mov		es,	ax
+	mov		eax, 0x17
+	mov		fs,	ax
 	jmp		ret_from_sys_call
 	
 ;iret

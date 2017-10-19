@@ -73,9 +73,9 @@ static void set_new_task(int num, union task_union *new_task, uint32_t enter_add
 	//set ldt segment [base limit dpl type]
 	set_seg_descriptor(&(new_task->task.ldt[1]), 0, 0xFFFFFFFF, 3, D_RE);
 	set_seg_descriptor(&(new_task->task.ldt[2]), 0, 0xFFFFFFFF, 3, D_RW);
-	//set ldt date	
+	//set ldt descriptor	
 	set_ldt_descriptor(num, (uint32_t)new_task->task.ldt, 3);	
-	//set tss gate
+	//set tss descriptor
 	set_tss_descriptor(num, (uint32_t)&(new_task->task.tss));
 	//ss esp
 	new_task->task.tss.esp0 = (uint32_t)&(new_task->task) + PAGE_SIZE;
