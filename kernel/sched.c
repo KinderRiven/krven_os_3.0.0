@@ -12,8 +12,6 @@ union task_union {
 	char stack[PAGE_SIZE];
 };
 
-char user_stack[NR_TASKS][PAGE_SIZE];
-
 static union task_union init_task;
 struct task_struct *task[NR_TASKS];
 struct task_struct *current;
@@ -55,7 +53,7 @@ void schedule()
 			break;
 		}
 	}
-	switch_to(current_index);
+	//switch_to(current_index);
 }
 
 void do_timer(uint16_t dpl)
@@ -92,7 +90,6 @@ static void set_new_task(int num, union task_union *new_task, uint32_t enter_add
 	new_task->task.tss.es = new_task->task.tss.gs = 0x17;
 	//eip
 	new_task->task.tss.eip = enter_addr;
-	new_task->task.tss.esp = (uint32_t)user_stack[num] + PAGE_SIZE;
 }
 
 static void set_init_task() 

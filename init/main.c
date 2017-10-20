@@ -1,16 +1,22 @@
 #include <types.h>
 #include <system.h>
 #include <sched.h>
+#include <sys.h>
+#include <unistd.h>
 #include <memory.h>
 #include <asm.h>
 #include <kernel.h>
 
+extern fn_ptr sys_call_table();
 extern void move_to_user_mode();
 extern int trap_init();
 static uint32_t memory_start;
 static uint32_t memory_end;
 
 #define EXT_MEM_K (*((uint16_t*)0x90002))
+
+_syscall0(int, test);
+_syscall0(int, fork);
 
 void kernel_main() {
 	int flags = 0;
@@ -65,9 +71,17 @@ void kernel_main() {
 	else {
 		printc(c_black, c_red, "[ERROR] SYSTEM CALL INIT\n");
 	}	
+	
 	//sti
 	sti();
 	move_to_user_mode();
-	__asm__ volatile("int $0x80");
+
+	//fork	
+	if(!(flags = fork())) {
+		printc(c_black, c_green, "[SUCCESS] FORK[%d]\n", flags);
+	} 
+	else {
+		printc(c_black, c_green, "[SUCCESS] FORK[%d]\n", flags);
+	}
 	for(;;) {}
 }

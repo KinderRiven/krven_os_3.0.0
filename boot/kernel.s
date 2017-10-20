@@ -38,9 +38,11 @@ page_4:
 kernel_jmp:
 	call	kernel_main
 	jmp		$
+	push	eax
 	jmp		$
+	push	ebx
 	jmp		$
-	jmp		$
+	push	ecx
 
 section .data
 ALIGN	8

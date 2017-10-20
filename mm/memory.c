@@ -52,6 +52,13 @@ static void mem_stack_init(uint32_t memory_start, uint32_t memory_end)
 	printc(c_black, c_light_green, "[MEMORY] MEM_STACK:%d(0x%x-0x%x)\n", mem_stack_top, memory_start, memory_end);
 }
 
+uint32_t get_free_page()
+{
+	if(mem_stack_top > 0)
+		return mem_stack[--mem_stack_top];
+	return -1;
+}
+
 int mem_init(uint32_t memory_start, uint32_t memory_end)
 {
 	page_init();

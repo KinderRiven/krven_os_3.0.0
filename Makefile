@@ -34,6 +34,7 @@ kernel: boot/kernel.o init/main.o \
 	kernel/system_call.o kernel/system_call_s.o \
 	kernel/io.o lib/string.o kernel/console.o  kernel/asm.o \
 	mm/memory.o \
+	kernel/fork.o \
 	kernel/vsprintf.o kernel/printk.o
 	$(LD) $(LD_FLAGS) \
 	boot/kernel.o init/main.o \
@@ -42,6 +43,7 @@ kernel: boot/kernel.o init/main.o \
 	kernel/system_call.o kernel/system_call_s.o \
 	kernel/io.o lib/string.o kernel/console.o kernel/asm.o \
 	mm/memory.o \
+	kernel/fork.o \
 	kernel/vsprintf.o kernel/printk.o \
 	-o KERNEL
 	objcopy -O binary KERNEL KERNEL.bin
