@@ -3,9 +3,9 @@
 #include <system.h>
 #include <io.h>
 #include <memory.h>
-
 extern void timer_interrupt();
 extern uint32_t page_dir;
+extern uint32_t task0_stack_top;
 
 union task_union {
 	struct task_struct task;
@@ -15,7 +15,7 @@ union task_union {
 static union task_union init_task;
 struct task_struct *task[NR_TASKS];
 struct task_struct *current;
-static int current_index = 0;
+int current_index = 0;
 
 static void init_timer(uint32_t frequency) 
 {
@@ -53,7 +53,8 @@ void schedule()
 			break;
 		}
 	}
-	//switch_to(current_index);
+	printc(c_black, c_light_green, "[%d] ready to run.\n", current_index);
+	switch_to(current_index);
 }
 
 void do_timer(uint16_t dpl)
@@ -70,7 +71,7 @@ static void set_new_task(int num, union task_union *new_task, uint32_t enter_add
 	task[num] = &(new_task->task);
 	//set ldt segment [base limit dpl type]
 	set_seg_descriptor(&(new_task->task.ldt[1]), 0, 0xFFFFFFFF, 3, D_RE);
-	set_seg_descriptor(&(new_task->task.ldt[2]), 0, 0xFFFFFFFF, 3, D_RW);
+	set_seg_descriptor(&(new_task->task.ldt[2]), 0, 0xFFFFFFFF, 3, D_RW);		
 	//set ldt descriptor	
 	set_ldt_descriptor(num, (uint32_t)new_task->task.ldt, 3);	
 	//set tss descriptor
@@ -100,7 +101,10 @@ static void set_init_task()
 	lldt(0);
 	//set tss register
 	ltr(0);
-	current = &init_task.task; 
+	current = &init_task.task;
+	current->user_stack_top = (uint32_t)&task0_stack_top;
+	current->kernel_stack_top = current->tss.esp0;
+	//printk("user_task_top [%x][%x]\n", &task0_stack_top, current->user_stack_top);
 }
 
 int sched_init() 

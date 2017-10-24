@@ -1,10 +1,9 @@
 [BITS 32]
-
 KERNEL_PAGE_NUM		equ	5
 PAGE_SIZE			equ	4096
 
 [global kernel_entry]
-[global kernel_stack]
+[global task0_stack_top]
 [global page_dir]
 [global gdt]
 [global idt]
@@ -19,7 +18,7 @@ kernel_entry:
 	mov		es,	ax
 	mov		ss, ax
 	mov		eax,gdt
-	mov		esp,kernel_stack
+	mov		esp,task0_stack_top
 	lgdt	[gdt_48]
 	lidt	[idt_48]
 	jmp		kernel_jmp
@@ -74,6 +73,6 @@ idt:
 	times	(8 * 256)	db	0
 idt_length	equ		($ - idt - 1)
 
-kernel_stack_bottom:
+task0_stack_bottom:
 	times	4096	db	0	
-kernel_stack:
+task0_stack_top:

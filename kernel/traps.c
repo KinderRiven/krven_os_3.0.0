@@ -1,5 +1,6 @@
 #include <system.h>
-
+#include <unistd.h>
+extern int current_index;
 //DE-0
 void divide_error();
 //PF-14
@@ -12,7 +13,7 @@ void do_divide_error()
 
 void do_page_error() 
 {
-
+	printk("Now current %d\n", current_index);
 }
 
 int trap_init() 

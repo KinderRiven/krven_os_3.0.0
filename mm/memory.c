@@ -5,7 +5,7 @@
 static uint32_t *mem_dir;
 static uint32_t *mem_page[NR_PAGES];
 static uint32_t  mem_stack[NR_MM_PAGES];
-static int mem_stack_top;
+static int mem_stack_top = 0;
 
 static void page_init()
 {
@@ -45,7 +45,6 @@ static void mem_stack_init(uint32_t memory_start, uint32_t memory_end)
 	uint32_t addr;
 	memory_start &= PAGE_MASK;
 	memory_end &= PAGE_MASK;
-	mem_stack_top = 0;
 	for(addr = memory_start; addr < memory_end; addr += PAGE_SIZE) {
 		mem_stack[mem_stack_top++] = addr;
 	}
