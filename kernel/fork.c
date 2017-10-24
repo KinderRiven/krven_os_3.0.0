@@ -29,10 +29,8 @@ int copy_mem(int nr, struct task_struct *p)
 	uint32_t tmp = p->tss.esp;
 	__asm__ volatile("movl %%esp, %%eax\n\t":"=a"(_esp)); 
 	p->tss.esp = (tmp - current->user_stack_top + PAGE_SIZE) + (p->user_stack_top - PAGE_SIZE);
-	//printk("%x = (%x - %x - %x) + (%x - %x)\n", p->tss.esp, tmp, current->user_stack_top, PAGE_SIZE, p->user_stack_top, PAGE_SIZE);
-	printk("user_task copy from[%x] to[%x] now esp[%x] esp[%x][%x]\n", 
+	printc(c_black, c_cyan, "user_task copy from[%x] to[%x] now esp[%x] esp[%x][%x]\n", 
 		current_stack, user_stack, _esp, ret_esp, p->tss.esp);
-	//while(1);
 	return 0;
 }
 

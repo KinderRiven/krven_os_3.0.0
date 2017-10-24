@@ -54,6 +54,7 @@ void schedule()
 		}
 	}
 	printc(c_black, c_light_green, "[%d] ready to run.\n", current_index);
+	//while(1); 0x5538
 	switch_to(current_index);
 }
 
