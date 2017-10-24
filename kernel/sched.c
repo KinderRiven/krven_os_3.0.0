@@ -1,8 +1,9 @@
-#include <sched.h>
-#include <asm.h>
-#include <system.h>
-#include <io.h>
-#include <memory.h>
+#include "sched.h"
+#include "unistd.h"
+#include "asm.h"
+#include "system.h"
+#include "io.h"
+#include "memory.h"
 extern void timer_interrupt();
 extern uint32_t page_dir;
 extern uint32_t task0_stack_top;
@@ -49,12 +50,11 @@ void schedule()
 {
 	while(1) {
 		current_index = ((current_index + 1) % NR_TASKS);
-		if(task[current_index] != NULL) {
+		if(task[current_index] != NULL && task[current_index]->status == TASK_RUNNING) {
 			break;
 		}
 	}
-	printc(c_black, c_light_green, "[%d] ready to run.\n", current_index);
-	//while(1); 0x5538
+	//printc(c_black, c_light_green, "[%d] ready to run.\n", current_index);
 	switch_to(current_index);
 }
 
@@ -77,6 +77,9 @@ static void set_new_task(int num, union task_union *new_task, uint32_t enter_add
 	set_ldt_descriptor(num, (uint32_t)new_task->task.ldt, 3);	
 	//set tss descriptor
 	set_tss_descriptor(num, (uint32_t)&(new_task->task.tss));
+	//status
+	new_task->task.status = TASK_RUNNING;
+	new_task->task.tss.ldt = _LDT(num);
 	//ss esp
 	new_task->task.tss.esp0 = (uint32_t)&(new_task->task) + PAGE_SIZE;
 	new_task->task.tss.ss0 = 0x10;	

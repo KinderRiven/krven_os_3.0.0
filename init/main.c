@@ -77,13 +77,11 @@ void kernel_main() {
 	move_to_user_mode();
 
 	//fork	
-	if(!fork()) {
-		while(1);
-		printc(c_black, c_red, "[SUCCESS] CHILD FORK[%d]\n", flags);
+	if(!(flags = fork())) {
+		//printc(c_black, c_red, "[SUCCESS] CHILD FORK[%d]\n", flags);
 		while(1);
 	} 
 	else {
-		while(1);
 		printc(c_black, c_green, "[SUCCESS] PARENT FORK[%d]\n", flags);
 		while(1);
 	}

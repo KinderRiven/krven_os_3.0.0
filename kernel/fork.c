@@ -23,14 +23,15 @@ int copy_mem(int nr, struct task_struct *p)
 	uint32_t user_stack = get_free_page();
 	uint32_t ret_esp = p->tss.esp;
 	p->user_stack_top = user_stack + PAGE_SIZE;
+	
 	uint32_t current_stack = current->user_stack_top - PAGE_SIZE;
 	memcpy((char *)current_stack, (char *)user_stack, PAGE_SIZE);
-	uint32_t _esp;
+	
 	uint32_t tmp = p->tss.esp;
-	__asm__ volatile("movl %%esp, %%eax\n\t":"=a"(_esp)); 
-	p->tss.esp = (tmp - current->user_stack_top + PAGE_SIZE) + (p->user_stack_top - PAGE_SIZE);
-	printc(c_black, c_cyan, "user_task copy from[%x] to[%x] now esp[%x] esp[%x][%x]\n", 
-		current_stack, user_stack, _esp, ret_esp, p->tss.esp);
+	p->tss.esp = (tmp - (current->user_stack_top - PAGE_SIZE)) + (p->user_stack_top - PAGE_SIZE);
+	
+	printc(c_black, c_cyan, "user_task copy from[%x] to[%x] esp[%x][%x]\n", 
+		current_stack, user_stack, ret_esp, p->tss.esp);
 	return 0;
 }
 
@@ -43,7 +44,9 @@ int copy_process(int nr, uint32_t ebp, uint32_t edi, uint32_t esi, uint32_t gs, 
 	struct task_struct *p = (struct task_struct*) get_free_page();
 	task[nr] = p;
 	memcpy((char *)current, (char *)p, PAGE_SIZE);
-	p->kernel_stack_top = (uint32_t)p + PAGE_SIZE;
+	p->status = TASK_RUNNING;
+	p->clock = 10;
+	p->kernel_stack_top = (uint32_t)p+PAGE_SIZE;
 	//update tss struct
 	p->tss.back_link = 0;
 	p->tss.esp0 = (uint32_t)p+PAGE_SIZE;
@@ -72,5 +75,6 @@ int copy_process(int nr, uint32_t ebp, uint32_t edi, uint32_t esi, uint32_t gs, 
 	set_ldt_descriptor(nr, (uint32_t)p->ldt, 3);	
 	//set tss descriptor
 	set_tss_descriptor(nr, (uint32_t)&(p->tss));
+	printc(c_black, c_light_green, "fork finished!\n");
 	return nr;
 }

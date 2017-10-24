@@ -1,32 +1,28 @@
 [BITS 32]
 [global divide_error]
 [global page_error]
+[global protect_error]
 [global tss_error]
-[extern do_page_error]
-
-no_error_code:
-	push	0
-	jmp		$
-	mov		eax, 0
-
-error_code:
-	jmp		$	
-	mov		eax, 1
-
-
-tss_error:
-	jmp		$
-	mov		eax, 2
+[extern do_error]
 
 ;DE-0
 divide_error:
-	jmp		no_error_code
-	jmp		$
-	mov		eax, 3
+	push	0
+	push	0
+	call	do_error
 
+;TS-10
+tss_error:
+	mov		eax, 10
+	push	eax
+	call	do_error
+;
+protect_error:
+	mov		eax, 13
+	push	eax
+	call	do_error
 ;PF-14
 page_error:
-	jmp		$
-	jmp		do_page_error
-	jmp		$
-	mov		eax, 4
+	mov		eax, 14
+	push	eax
+	call	do_error
