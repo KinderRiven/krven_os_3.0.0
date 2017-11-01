@@ -78,11 +78,11 @@ void kernel_main() {
 
 	//fork	
 	if(!(flags = fork())) {
-		//printc(c_black, c_red, "[SUCCESS] CHILD FORK[%d]\n", flags);
+		printc(c_black, c_cyan, "[SUCCESS] CHILD FORK[%d]\n", flags);
 		while(1);
 	} 
 	else {
-		printc(c_black, c_green, "[SUCCESS] PARENT FORK[%d]\n", flags);
+		printc(c_black, c_cyan, "[SUCCESS] PARENT FORK[%d]\n", flags);
 		while(1);
 	}
 	for(;;) {}

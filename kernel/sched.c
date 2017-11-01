@@ -54,7 +54,6 @@ void schedule()
 			break;
 		}
 	}
-	//printc(c_black, c_light_green, "[%d] ready to run.\n", current_index);
 	switch_to(current_index);
 }
 
@@ -108,7 +107,6 @@ static void set_init_task()
 	current = &init_task.task;
 	current->user_stack_top = (uint32_t)&task0_stack_top;
 	current->kernel_stack_top = current->tss.esp0;
-	//printk("user_task_top [%x][%x]\n", &task0_stack_top, current->user_stack_top);
 }
 
 int sched_init() 
